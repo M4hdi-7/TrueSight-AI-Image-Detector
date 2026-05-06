@@ -1,4 +1,4 @@
-# TrueSight | AI Image Detector
+# TrueSight | AI Image Detector v1.0
 
 Welcome to TrueSight! This is a local web application designed to help detect AI-generated images.
 
@@ -43,7 +43,9 @@ Type the IP address shown in the launcher into your phone's browser (Chrome/Safa
 
 *Tip: If you scan an image on your PC and want to see it on your phone, go to the History tab and tap the blue "Refresh" button.*
 
-## Limitations
+## Limitations & Early Version Disclaimer
+> **⚠️ WARNING:** TrueSight is currently an experimental prototype (v1.0). The AI models are **not 100% accurate** and may occasionally produce false positives or false negatives. Do not use this tool as the definitive proof of an image's authenticity. It is a supplemental forensic tool, and results should be manually reviewed.
+
 * **WhatsApp/Social Media Images:** These are heavily compressed. The app might label them as "Uncertain" or "Suspicious" because the compression artifacts look a bit like AI noise. This is normal behavior for v1.0.
 * **Speed:** Since it runs 5 heavy AI models on your own computer, the first scan might take a few seconds depending on your PC's speed.
 

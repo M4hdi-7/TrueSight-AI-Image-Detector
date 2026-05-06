@@ -1,5 +1,5 @@
 ========================================================================
-                      TRUESIGHT | AI Image Detector 
+                      TRUESIGHT | AI Image Detector v1.0
 ========================================================================
 
 Welcome to TrueSight! This is a local web application designed to help detect 
@@ -62,8 +62,15 @@ Tip: If you scan an image on your PC and want to see it on your phone, go to the
 History tab and tap the blue "Refresh" button.
 
 ------------------------------------------------------------------------
-THINGS TO KNOW (Limitations)
+THINGS TO KNOW (Limitations & Early Version Disclaimer)
 ------------------------------------------------------------------------
+[!] WARNING [!]
+TrueSight is currently an experimental prototype (v1.0). The AI models are 
+NOT 100% accurate and may occasionally produce false positives or false 
+negatives. Do not use this tool as the definitive proof of an image's 
+authenticity. It is a supplemental forensic tool, and results should be 
+manually reviewed.
+
 * WhatsApp/Social Media Images: These are heavily compressed. The app might label 
     them as "Uncertain" or "Suspicious" because the compression artifacts look 
     a bit like AI noise. This is normal behavior for v1.0.
