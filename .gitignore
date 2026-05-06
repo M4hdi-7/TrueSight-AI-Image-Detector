@@ -1,0 +1,19 @@
+# Virtual Environments
+backend/venv/
+venv/
+env/
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database and Uploads (DON'T upload these to GitHub!)
+backend/history.db
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# OS Files
+.DS_Store
+Thumbs.db

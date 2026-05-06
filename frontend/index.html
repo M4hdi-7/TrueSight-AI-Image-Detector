@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrueSight | AI Image Detector</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <header>
+            <img src="logo.png" alt="TrueSight Logo" class="app-logo">
+        </header>
+
+        <nav class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('home')">
+                <i class="fas fa-home"></i> <span>Home</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('history')">
+                <i class="fas fa-history"></i> <span>History</span>
+            </button>
+        </nav>
+
+        <main id="home-view" class="view active-view">
+            <div class="card main-card">
+
+                <div class="upload-area" id="dropZone">
+                    <div class="icon-circle">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Upload Image</h3>
+                    <p>JPEG, PNG, WEBP, up to 16MB</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                    <div class="image-wrapper">
+                        <img id="preview" src="" alt="Image Preview">
+                    </div>
+                    <button id="removeBtn" class="remove-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <button id="uploadBtn" class="primary-btn" disabled>
+                    Analyze Image
+                </button>
+
+                <div id="result" class="result-container" style="display: none;">
+                    <div class="result-header">
+                        <h2 id="resultTitle">Analyzing...</h2>
+                    </div>
+
+                    <div class="confidence-wrapper">
+                        <div class="confidence-labels">
+                            <span>Confidence Score</span>
+                            <span id="confValue">0%</span>
+                        </div>
+                        <div class="progress-bg">
+                            <div id="progressBar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div id="extraInfo"></div>
+                    </div>
+
+                    <button id="detailsBtn" class="secondary-btn" onclick="openDetailsModal()">
+                        <i class="fas fa-search-plus"></i> View Forensic Details
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <main id="history-view" class="view" style="display: none;">
+            <div class="history-header">
+                <h2>Scan History</h2>
+                <div class="history-actions">
+                    <button class="icon-btn refresh-btn" onclick="fetchHistory()" title="Refresh List">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="icon-btn clear-btn" onclick="clearHistory()" title="Clear All History">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="historyList" class="history-grid">
+            </div>
+        </main>
+
+    </div>
+
+    <div id="detailsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Forensic Report</h3>
+                <button class="close-modal" onclick="closeDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image-wrapper">
+                    <img id="modalImg" src="" alt="Analyzed">
+                </div>
+
+                <div class="report-section">
+                    <h4><i class="fas fa-list-ul"></i> Detection Signals</h4>
+                    <ul id="modalReasons"></ul>
+                </div>
+
+                <div class="report-section">
+                    <h4><i class="fas fa-fingerprint"></i> Metadata</h4>
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <span class="label">Camera</span>
+                            <span class="value" id="metaCamera">Unknown</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">Software</span>
+                            <span class="value" id="metaSoftware">Unknown</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
