@@ -285,20 +285,40 @@ header {
     padding: 50px 20px;
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
+    transition: border-color 0.25s ease,
+                background-color 0.25s ease,
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
     background: var(--bg-input);
     margin-bottom: 20px;
 }
+
+.upload-area > * { pointer-events: none; }
+.upload-area input { pointer-events: auto; }
 
 .upload-area:hover {
     border-color: var(--primary);
     background: var(--bg-input-hover);
 }
 
+.upload-area.drag-active {
+    border-color: var(--primary);
+    border-style: solid;
+    background: var(--bg-input-hover);
+    transform: scale(1.015);
+    box-shadow: 0 8px 24px -8px rgba(0, 48, 87, 0.25);
+}
+
+.upload-area.drag-active .icon-circle {
+    transform: scale(1.15) translateY(-4px);
+    color: var(--primary-light);
+}
+
 .icon-circle {
     font-size: 2.5rem;
     color: var(--primary);
     margin-bottom: 15px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease;
 }
 
 .upload-area h3 { font-weight: 600; margin-bottom: 5px; }

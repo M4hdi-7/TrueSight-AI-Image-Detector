@@ -111,6 +111,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dropZone.addEventListener("click", () => fileInput.click());
 
+    // --- DRAG & DROP ---
+    let dragCounter = 0;
+
+    dropZone.addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter++;
+        dropZone.classList.add("drag-active");
+    });
+
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = "copy";
+    });
+
+    dropZone.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter--;
+        if (dragCounter <= 0) {
+            dragCounter = 0;
+            dropZone.classList.remove("drag-active");
+        }
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter = 0;
+        dropZone.classList.remove("drag-active");
+
+        const files = e.dataTransfer.files;
+        if (!files || files.length === 0) return;
+
+        const file = files[0];
+        if (!file.type.startsWith("image/")) {
+            alert("Please drop an image file");
+            return;
+        }
+
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        fileInput.dispatchEvent(new Event("change"));
+    });
+
+    // Prevent the browser from opening the file when dropped outside the zone
+    ["dragover", "drop"].forEach(evt => {
+        window.addEventListener(evt, (e) => {
+            if (e.target !== dropZone && !dropZone.contains(e.target)) {
+                e.preventDefault();
+            }
+        });
+    });
+
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
