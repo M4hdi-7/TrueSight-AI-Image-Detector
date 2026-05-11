@@ -374,10 +374,12 @@ function openDetailsModal(data = null) {
     }
 
     document.getElementById("detailsModal").style.display = 'flex';
+    document.body.classList.add("modal-open");
 }
 
 function closeDetailsModal() {
     document.getElementById("detailsModal").style.display = 'none';
+    document.body.classList.remove("modal-open");
 }
 
 window.onclick = function (event) {
