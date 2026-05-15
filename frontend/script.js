@@ -23,6 +23,12 @@ const CLEAR_URL = `${BASE_URL}/clear_history`;
 let currentAnalysis = null;
 let lastHistoryJson = "";
 
+let sessionId = localStorage.getItem('truesight_session_id');
+if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem('truesight_session_id', sessionId);
+}
+
 // -------------------------------
 // LABEL + COLOR (CLEAN VERSION)
 // -------------------------------
@@ -212,11 +218,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const formData = new FormData();
         formData.append("image", file);
+        formData.append("session_id", sessionId);
 
         uploadBtn.innerText = "Analyzing Signals...";
 
         try {
-            const response = await fetch(API_URL, { method: "POST", body: formData });
+            const response = await fetch(API_URL, { 
+                method: "POST", 
+                body: formData,
+                headers: {
+                    "ngrok-skip-browser-warning": "true"
+                }
+            });
             const data = await response.json();
 
             const aiScore = data.score * 100;
@@ -287,7 +300,11 @@ async function fetchHistory() {
     const list = document.getElementById("historyList");
 
     try {
-        const response = await fetch(`${HISTORY_URL}?t=${Date.now()}`);
+        const response = await fetch(`${HISTORY_URL}?session_id=${sessionId}&t=${Date.now()}`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         const historyData = await response.json();
 
         const currentJson = JSON.stringify(historyData);
@@ -331,8 +348,13 @@ async function fetchHistory() {
 }
 
 async function clearHistory() {
-    if (confirm("Clear all history?")) {
-        await fetch(CLEAR_URL, { method: "DELETE" });
+    if (confirm("Clear all your history?")) {
+        await fetch(`${CLEAR_URL}?session_id=${sessionId}`, { 
+            method: "DELETE",
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         lastHistoryJson = "";
         fetchHistory();
     }

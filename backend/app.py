@@ -32,6 +32,7 @@ def init_db():
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
                 filename TEXT NOT NULL,
                 result TEXT NOT NULL,
                 confidence REAL,
@@ -61,6 +62,8 @@ def serve_image(filename):
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        session_id = request.form.get("session_id", "default")
+
         # Basic validation checks
         if "image" not in request.files:
             return jsonify({"error": "No image uploaded"}), 400
@@ -100,9 +103,9 @@ def predict():
         with sqlite3.connect(DB_FILE) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO history (filename, result, confidence, reasons, timestamp)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (filename, label, confidence, reasons_json, timestamp))
+                INSERT INTO history (session_id, filename, result, confidence, reasons, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (session_id, filename, label, confidence, reasons_json, timestamp))
             conn.commit()
 
         # Send the results back to the frontend
@@ -123,12 +126,16 @@ def predict():
 # Sends the list of past scans to the phone
 @app.route("/history", methods=["GET"])
 def get_history():
+    session_id = request.args.get("session_id")
+    if not session_id:
+        return jsonify([])
+
     try:
         with sqlite3.connect(DB_FILE) as conn:
             conn.row_factory = sqlite3.Row # This lets us select columns by name
             cursor = conn.cursor()
-            # Get the last 50 scans, newest first
-            cursor.execute("SELECT * FROM history ORDER BY id DESC LIMIT 50")
+            # Get the last 50 scans for this session
+            cursor.execute("SELECT * FROM history WHERE session_id = ? ORDER BY id DESC LIMIT 50", (session_id,))
             rows = cursor.fetchall()
             
             history_data = []
@@ -151,17 +158,25 @@ def get_history():
 # Deletes images and clears the database
 @app.route("/clear_history", methods=["DELETE"])
 def clear_history():
+    session_id = request.args.get("session_id")
+    if not session_id:
+        return jsonify({"error": "No session ID"}), 400
+
     try:
-        # Delete the actual image files
-        for f in os.listdir(UPLOAD_FOLDER):
-            file_path = os.path.join(UPLOAD_FOLDER, f)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-        
-        # Wipe the database rows
         with sqlite3.connect(DB_FILE) as conn:
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM history")
+            # Find all files belonging to this user
+            cursor.execute("SELECT filename FROM history WHERE session_id = ?", (session_id,))
+            rows = cursor.fetchall()
+
+            # Delete the actual image files
+            for row in rows:
+                file_path = os.path.join(UPLOAD_FOLDER, row[0])
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            
+            # Wipe the database rows for this user
+            cursor.execute("DELETE FROM history WHERE session_id = ?", (session_id,))
             conn.commit()
             
         return jsonify({"status": "cleared"})
