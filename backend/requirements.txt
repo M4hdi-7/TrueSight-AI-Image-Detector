@@ -5,3 +5,4 @@ torch
 pillow
 opencv-python-headless
 numpy
+gunicorn

@@ -11,8 +11,8 @@ function toggleTheme() {
 // -------------------------------
 // NETWORK SETUP
 // -------------------------------
-const currentIP = window.location.hostname;
-const BASE_URL = `http://${currentIP}:5000`;
+//const currentIP = window.location.hostname;
+const BASE_URL = `https://phony-worry-these.ngrok-free.dev`;
 const API_URL = `${BASE_URL}/predict`;
 const HISTORY_URL = `${BASE_URL}/history`;
 const CLEAR_URL = `${BASE_URL}/clear_history`;
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // -------------------------------
             if (data.signals) {
                 const s = data.signals;
-                
+
                 let statsHtml = '';
                 for (const [expert, score] of Object.entries(s)) {
                     statsHtml += `<p>${expert}: ${score.toFixed(1)}% AI Likelihood</p>`;
