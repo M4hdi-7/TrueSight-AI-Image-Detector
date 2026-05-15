@@ -14,20 +14,11 @@ function toggleTheme() {
 //const currentIP = window.location.hostname;
 const BASE_URL = `https://phony-worry-these.ngrok-free.dev`;
 const API_URL = `${BASE_URL}/predict`;
-const HISTORY_URL = `${BASE_URL}/history`;
-const CLEAR_URL = `${BASE_URL}/clear_history`;
 
 // -------------------------------
 // APP STATE
 // -------------------------------
 let currentAnalysis = null;
-let lastHistoryJson = "";
-
-let sessionId = localStorage.getItem('truesight_session_id');
-if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem('truesight_session_id', sessionId);
-}
 
 // -------------------------------
 // LABEL + COLOR (CLEAN VERSION)
@@ -85,6 +76,46 @@ async function compressImage(file, maxWidth = 1920, maxHeight = 1920) {
                 }, 'image/jpeg', 0.85);
             };
         };
+    });
+}
+
+// -------------------------------
+// LOCAL HISTORY UTILS
+// -------------------------------
+async function generateThumbnail(fileOrDataUrl) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxSize = 200; // Small thumbnail size to fit in localStorage
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        
+        if (typeof fileOrDataUrl === 'string') {
+            img.src = fileOrDataUrl;
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => img.src = e.target.result;
+            reader.readAsDataURL(fileOrDataUrl);
+        }
     });
 }
 
@@ -218,7 +249,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const formData = new FormData();
         formData.append("image", file);
-        formData.append("session_id", sessionId);
 
         uploadBtn.innerText = "Analyzing Signals...";
 
@@ -272,15 +302,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (extra) extra.innerHTML = signalsHTML;
             }
 
-            // SAVE CURRENT ANALYSIS
+            // SAVE CURRENT ANALYSIS locally
+            const thumbDataUrl = await generateThumbnail(document.getElementById("preview").src);
             currentAnalysis = {
-                image: `${BASE_URL}/uploads/${data.filename}`,
+                image: thumbDataUrl, // Store thumbnail locally
                 result: data.verdict,
                 confidence: Math.round(aiScore),
                 signals: data.signals,
                 metadata: data.metadata,
-                reasons: data.reasons
+                reasons: data.reasons,
+                timestamp: new Date().toLocaleString()
             };
+
+            // Read existing history from localStorage
+            let localHistory = [];
+            try {
+                const stored = localStorage.getItem('truesight_history');
+                if (stored) localHistory = JSON.parse(stored);
+            } catch (e) {}
+
+            // Add new analysis to front of array
+            localHistory.unshift(currentAnalysis);
+            
+            // Keep only the last 30 scans so we don't overflow localStorage (5MB limit)
+            if (localHistory.length > 30) localHistory.pop();
+            
+            localStorage.setItem('truesight_history', JSON.stringify(localHistory));
 
             fetchHistory();
 
@@ -299,63 +346,45 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchHistory() {
     const list = document.getElementById("historyList");
 
+    let historyData = [];
     try {
-        const response = await fetch(`${HISTORY_URL}?session_id=${sessionId}&t=${Date.now()}`, {
-            headers: {
-                "ngrok-skip-browser-warning": "true"
-            }
-        });
-        const historyData = await response.json();
-
-        const currentJson = JSON.stringify(historyData);
-        if (currentJson === lastHistoryJson && list.children.length > 0) return;
-        lastHistoryJson = currentJson;
-
-        if (historyData.length === 0) {
-            list.innerHTML = `<div style="text-align:center; color:#aaa;">No history yet</div>`;
-            return;
-        }
-
-        list.innerHTML = "";
-
-        historyData.forEach(item => {
-            const forensic = getForensicLabel(item.confidence);
-            const imageUrl = `${BASE_URL}/uploads/${item.filename}`;
-
-            const div = document.createElement("div");
-            div.className = "history-item";
-
-            div.onclick = () => openDetailsModal({
-                ...item,
-                image: imageUrl
-            });
-
-            div.innerHTML = `
-                <img src="${imageUrl}" class="history-thumb">
-                <div class="history-info">
-                    <h4 style="color:${forensic.color}">${forensic.label}</h4>
-                    <p>${item.confidence}% AI Likelihood</p>
-                </div>
-            `;
-
-            list.appendChild(div);
-        });
-
-    } catch (error) {
-        console.error(error);
-        list.innerHTML = `<div style="color:red;">Connection Failed</div>`;
+        const stored = localStorage.getItem('truesight_history');
+        if (stored) historyData = JSON.parse(stored);
+    } catch (e) {
+        console.error("Failed to read local history", e);
     }
+
+    if (historyData.length === 0) {
+        list.innerHTML = `<div style="text-align:center; color:#aaa;">No history yet</div>`;
+        return;
+    }
+
+    list.innerHTML = "";
+
+    historyData.forEach(item => {
+        const forensic = getForensicLabel(item.confidence);
+        
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        div.onclick = () => openDetailsModal(item);
+
+        div.innerHTML = `
+            <img src="${item.image}" class="history-thumb">
+            <div class="history-info">
+                <h4 style="color:${forensic.color}">${forensic.label}</h4>
+                <p>${item.confidence}% AI Likelihood</p>
+                <small style="opacity: 0.5; font-size: 0.75rem;">${item.timestamp || ''}</small>
+            </div>
+        `;
+
+        list.appendChild(div);
+    });
 }
 
 async function clearHistory() {
-    if (confirm("Clear all your history?")) {
-        await fetch(`${CLEAR_URL}?session_id=${sessionId}`, { 
-            method: "DELETE",
-            headers: {
-                "ngrok-skip-browser-warning": "true"
-            }
-        });
-        lastHistoryJson = "";
+    if (confirm("Clear all your local history?")) {
+        localStorage.removeItem('truesight_history');
         fetchHistory();
     }
 }
