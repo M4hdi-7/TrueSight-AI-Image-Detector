@@ -41,48 +41,6 @@ function getForensicLabel(score) {
 }
 
 // -------------------------------
-// CLIENT-SIDE COMPRESSION
-// -------------------------------
-async function compressImage(file, maxWidth = 1920, maxHeight = 1920) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = event => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                let width = img.width;
-                let height = img.height;
-
-                if (width > maxWidth || height > maxHeight) {
-                    if (width > height) {
-                        height = Math.round((height *= maxWidth / width));
-                        width = maxWidth;
-                    } else {
-                        width = Math.round((width *= maxHeight / height));
-                        height = maxHeight;
-                    }
-                }
-
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob(blob => {
-                    const compressedFile = new File([blob], file.name, {
-                        type: 'image/jpeg',
-                        lastModified: Date.now()
-                    });
-                    resolve(compressedFile);
-                }, 'image/jpeg', 0.85);
-            };
-        };
-    });
-}
-
-// -------------------------------
 // TAB SWITCHING
 // -------------------------------
 function switchTab(tabName) {
@@ -194,7 +152,9 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInput.value = "";
         dropZone.style.display = 'block';
         previewContainer.style.display = 'none';
+        uploadBtn.style.display = 'block';
         uploadBtn.disabled = true;
+        document.getElementById("loadingIndicator").style.display = 'none';
         resultContainer.style.display = 'none';
         currentAnalysis = null;
     });
@@ -202,13 +162,9 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadBtn.addEventListener("click", async () => {
         let file = fileInput.files[0];
 
-        uploadBtn.disabled = true;
-        uploadBtn.innerText = "Preparing Image...";
+        uploadBtn.style.display = 'none';
+        document.getElementById("loadingIndicator").style.display = 'block';
         resultContainer.style.display = 'none';
-
-        if (file.size > 500 * 1024) { // Compress if larger than 500KB
-            file = await compressImage(file);
-        }
 
         const formData = new FormData();
         formData.append("image", file);
@@ -233,10 +189,12 @@ document.addEventListener("DOMContentLoaded", () => {
             bar.style.width = `${aiScore}%`;
             bar.style.backgroundColor = forensic.color;
 
-            resultContainer.style.display = 'block';
-
+            document.getElementById("loadingIndicator").style.display = 'none';
+            uploadBtn.style.display = 'block';
             uploadBtn.innerText = "Analyze Image";
             uploadBtn.disabled = false;
+            
+            resultContainer.style.display = 'block';
 
             // -------------------------------
             // SIGNALS DISPLAY
@@ -245,13 +203,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 const s = data.signals;
                 
                 let statsHtml = '';
+                let attributionHtml = '';
                 for (const [expert, score] of Object.entries(s)) {
-                    statsHtml += `<p>${expert}: ${score.toFixed(1)}% AI Likelihood</p>`;
+                    if (expert.startsWith("Attribution")) {
+                        const engineMatch = expert.match(/Attribution \(([^)]+)\)/);
+                        const engineName = engineMatch ? engineMatch[1] : "Unknown";
+                        attributionHtml += `
+                            <div style="background: rgba(192, 57, 43, 0.15); border: 1px solid rgba(192, 57, 43, 0.3); border-radius: 6px; padding: 10px; margin-top: 10px; border-left: 4px solid #c0392b;">
+                                <strong style="color: #c0392b;"><i class="fas fa-robot"></i> AI Engine: ${engineName}</strong>
+                                <span style="float: right; opacity: 0.8;">${score.toFixed(1)}% Confidence</span>
+                            </div>
+                        `;
+                    } else {
+                        statsHtml += `<p>${expert}: ${score.toFixed(1)}%</p>`;
+                    }
                 }
 
                 const signalsHTML = `
                     <div style="margin-top:15px; font-size:0.9rem; opacity:0.85; line-height: 1.6;">
                         ${statsHtml}
+                        ${attributionHtml}
                     </div>
                 `;
 
@@ -274,6 +245,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error(error);
             alert("Server Error");
+            document.getElementById("loadingIndicator").style.display = 'none';
+            uploadBtn.style.display = 'block';
             uploadBtn.disabled = false;
             uploadBtn.innerText = "Analyze Image";
         }
@@ -345,6 +318,9 @@ function openDetailsModal(data = null) {
     const item = data || currentAnalysis;
     if (!item) return;
 
+    const imgWrapper = document.querySelector(".modal-image-wrapper");
+    if (imgWrapper) imgWrapper.classList.remove("expanded");
+
     document.getElementById("modalImg").src = item.image;
 
     document.getElementById("metaCamera").innerText =
@@ -387,3 +363,10 @@ window.onclick = function (event) {
         closeDetailsModal();
     }
 };
+
+const imgWrapper = document.querySelector(".modal-image-wrapper");
+if (imgWrapper) {
+    imgWrapper.addEventListener("click", function() {
+        this.classList.toggle("expanded");
+    });
+}

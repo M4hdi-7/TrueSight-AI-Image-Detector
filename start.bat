@@ -14,7 +14,7 @@ echo ======================================================
 echo.
 echo [1/2] Starting Backend Server (Port 5000)...
 :: Opens a new window, activates venv, runs app.py
-start "TrueSight Backend" cmd /k "cd backend && call venv\Scripts\activate && python app.py"
+start "TrueSight Backend" cmd /k "cd backend && venv\Scripts\python.exe app.py"
 
 echo [2/2] Starting Frontend Host (Port 8000)...
 :: Opens a new window, starts http server

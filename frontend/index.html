@@ -87,6 +87,13 @@
                     Analyze Image
                 </button>
 
+                <div id="loadingIndicator" style="display: none; margin-top: 20px; text-align: center; animation: slideUp 0.3s ease;">
+                    <p style="margin-bottom: 12px; font-weight: 500; font-size: 0.95rem; color: var(--text-muted);"><i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i> Analyzing with Hive AI...</p>
+                    <div style="width: 100%; height: 6px; background-color: var(--bg-progress); border-radius: 4px; overflow: hidden;">
+                        <div class="indeterminate-progress"></div>
+                    </div>
+                </div>
+
                 <div id="result" class="result-container" style="display: none;">
                     <div class="result-header">
                         <h2 id="resultTitle">Analyzing...</h2>

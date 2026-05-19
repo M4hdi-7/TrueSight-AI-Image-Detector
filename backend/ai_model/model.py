@@ -1,33 +1,8 @@
-import torch
-from transformers import pipeline
 from PIL import Image
 from PIL.ExifTags import TAGS
+from .hive_client import classify_image
 
-device = 0 if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else -1)
-
-print(f"Initializing TrueSight AI Jury (Loading 5 Models) on device: {device}...")
-
-# --- SET UP THE JURY ---
-# We load 5 different "Experts" to vote on the image.
-
-# 1. The Face Expert
-face_detector = pipeline("image-classification", model="dima806/deepfake_vs_real_image_detection", device=device)
-
-# 2. The Artistic Expert
-modern_detector = pipeline("image-classification", model="Ateeqq/ai-vs-human-image-detector", device=device)
-
-# 3. The Legacy Expert
-legacy_detector = pipeline("image-classification", model="umm-maybe/AI-image-detector", device=device)
-
-# 4. The Pixel Specialist
-forensic_detector = pipeline("image-classification", model="prithivMLmods/Deep-Fake-Detector-v2-Model", device=device)
-
-# 5. The Generalist
-general_detector = pipeline("image-classification", model="Nahrawy/AIorNot", device=device)
-
-print("Jury Ready. All systems go.")
-
-MAX_IMAGE_DIMENSION = 8000  # pixels — beyond this PIL + models risk running out of memory
+MAX_IMAGE_DIMENSION = 8000  # pixels — beyond this PIL risks running out of memory
 
 # Known AI generation tool names that may appear in an image's EXIF Software tag
 AI_SOFTWARE_NAMES = [
@@ -36,26 +11,22 @@ AI_SOFTWARE_NAMES = [
     "generative", "ai-generated",
 ]
 
-# Explicit label maps per model: stripped lowercase label → is_fake bool.
-# Prevents misclassification if a model relabels its outputs in a future update.
-# The keyword heuristic below is the fallback when a label isn't listed here.
-LABEL_MAPS = {
-    "face":     {"fake": True, "real": False, "deepfake": True},
-    "modern":   {"ai": True, "human": False},
-    "legacy":   {"artificial": True, "human": False, "fake": True, "real": False},
-    "forensic": {"fake": True, "real": False, "deepfake": True},
-    "general":  {"ai": True, "notai": False, "human": False},
-}
-FAKE_KEYWORDS = ["fake", "ai", "artificial", "generated", "deepfake", "synthetic"]
-REAL_KEYWORDS = ["real", "human", "notai", "authentic", "genuine"]
-
-
-def predict_image(image_path):
+def predict_image(image_path: str) -> tuple[str, float, list[str], dict]:
+    """
+    Analyzes an image using Hive's AI-Generated and Deepfake Content Detection V3 API
+    integrated with local EXIF metadata inspection.
+    
+    Returns:
+        label:      str   — headline verdict ("AI Generated", "Likely Real", etc.)
+        score:      float — 0.0–100.0 representing AI likelihood %
+        reasons:    list  — human-readable bullet points for the forensic report
+        signals:    dict  — per-signal breakdown for the UI (mutually exclusive scores mapped as percentages)
+    """
     try:
         pil_image = Image.open(image_path).convert("RGB")
-
-        # Reject absurdly large images before model inference to prevent OOM
         width, height = pil_image.size
+        
+        # Reject absurdly large images before API upload to avoid transmission and process overhead
         if width > MAX_IMAGE_DIMENSION or height > MAX_IMAGE_DIMENSION:
             return (
                 "Error",
@@ -63,125 +34,112 @@ def predict_image(image_path):
                 [f"Image is too large ({width}x{height}px). Maximum is {MAX_IMAGE_DIMENSION}px per side."],
                 {},
             )
-
+            
+        # Call Hive V3 API
+        try:
+            hive_response = classify_image(image_path)
+        except Exception as e:
+            print(f"Hive API integration error: {e}")
+            return (
+                "Error",
+                0.0,
+                ["Detection service unavailable. Please check your network connection or API key."],
+                {}
+            )
+            
+        # Parse output classes
+        output = hive_response.get("output", [])
+        if not output:
+            return (
+                "Error",
+                0.0,
+                ["Invalid response format from classification service."],
+                {}
+            )
+            
+        classes = output[0].get("classes", [])
+        scores = {item["class"]: item["value"] * 100 for item in classes if "class" in item and "value" in item}
+        
+        ai_score = scores.get("ai_generated", 0.0)
+        deepfake_score = scores.get("deepfake", 0.0)
+        
+        # Build UI signals (flat dictionary of {signal_name: score_percentage})
+        signals = {}
+        if "ai_generated" in scores:
+            signals["Hive AI Classifier"] = round(scores["ai_generated"], 1)
+        if "deepfake" in scores:
+            signals["Visual Deepfake Head"] = round(scores["deepfake"], 1)
+            
+        # Dynamically extract and format specific generator attribution heads if they are detected (value > 1.0%)
+        # This ensures we catch any new engines Hive adds (like gptimage2) without hardcoding them.
+        base_classes = {
+            "ai_generated", "not_ai_generated", 
+            "deepfake", "not_deepfake", "none",
+            "inconclusive", "inconclusive_video",
+            "ai_generated_audio", "not_ai_generated_audio"
+        }
+        for item in classes:
+            cls_name = item.get("class", "")
+            val = item.get("value", 0.0) * 100
+            if cls_name not in base_classes and val > 1.0:
+                signals[f"Attribution ({cls_name})"] = round(val, 1)
+                
         reasons = []
-        votes_fake = 0.0   # weighted sum — used for verdict threshold
-        votes_real = 0.0   # weighted sum — used for ai_probability denominator
-        count_fake = 0     # plain count of models that voted fake — used for display
-        count_real = 0     # plain count of models that voted real — used for display
-        confidences = []   # per-model certainty; failed models are excluded from avg
-
-        # --- STEP 1: JURY VOTING ---
-
-        def cast_vote(model, name, model_key, fake_reason, real_reason):
-            nonlocal votes_fake, votes_real, count_fake, count_real
-            try:
-                res = model(pil_image)
-                raw_label = res[0]["label"]
-                # Strip whitespace/separators so label maps match reliably
-                label = raw_label.lower().replace(" ", "").replace("_", "").replace("-", "")
-                conf = res[0]["score"] * 100
-
-                # Try the explicit label map first; fall back to keyword heuristic
-                label_map = LABEL_MAPS.get(model_key, {})
-                is_fake = label_map.get(label, None)
-                if is_fake is None:
-                    is_fake = any(x in label for x in FAKE_KEYWORDS)
-                    if not any(x in label for x in FAKE_KEYWORDS + REAL_KEYWORDS):
-                        # Log unmapped labels so we can update LABEL_MAPS if needed
-                        print(f"WARNING: {name} returned unmapped label '{raw_label}' — defaulting to REAL")
-
-                if is_fake and conf > 75:
-                    reasons.append(f"❌ {name}: {fake_reason}")
-                elif not is_fake and conf > 90:
-                    reasons.append(f"✅ {name}: {real_reason}")
-
-                weight = 2.0 if conf > 90.0 else (1.0 if conf >= 75.0 else 0.5)
-
-                if is_fake:
-                    votes_fake += weight
-                    count_fake += 1
-                else:
-                    votes_real += weight
-                    count_real += 1
-
-                confidences.append(conf)
-                return conf
-            except Exception as e:
-                print(f"Model Error {name}: {e}")
-                # Return None — excluded from avg_conf; no vote cast for this model
-                return None
-
-        # Ask each expert
-        c1 = cast_vote(face_detector,     "Face Check",    "face",     "The eyes or mouth look unnatural.",               "Facial structure looks human and organic.")
-        c2 = cast_vote(modern_detector,   "Style Check",   "modern",   "It has the smooth, 'perfect' look of AI art.",    "Lighting looks realistic.")
-        c3 = cast_vote(legacy_detector,   "Pattern Check", "legacy",   "Found digital patterns often left by generators.", "Details look random and natural.")
-        c4 = cast_vote(forensic_detector, "Pixel Check",   "forensic", "The pixels don't align like a normal photo.",     "Compression looks normal.")
-        c5 = cast_vote(general_detector,  "General Check", "general",  "Overall look matches known AI images.",            "Composition feels human.")
-
-        # --- STEP 1b: METADATA SIGNALS ---
-        # These supplement model votes without counting toward the N/5 display.
-
+        
+        # 1. Hive AI generated verdicts
+        if ai_score >= 90:
+            reasons.append("❌ Hive Detector: Strong AI generation signature detected.")
+        elif ai_score >= 60:
+            reasons.append("⚠️ Hive Detector: Some AI-generation features present.")
+        else:
+            reasons.append("✅ Hive Detector: No strong AI-generation signature.")
+            
+        # 2. Deepfake detection indicators
+        if deepfake_score >= 90:
+            reasons.append("❌ Deepfake Check: High probability of visual deepfake (face swap).")
+        elif deepfake_score >= 60:
+            reasons.append("⚠️ Deepfake Check: Suspicious face-swap patterns detected.")
+            
+        # 3. EXIF camera and software metadata validation
         meta = extract_metadata(image_path)
-
-        # No EXIF → weak fake signal (real camera photos almost always have EXIF)
         if not meta["has_exif"]:
-            votes_fake += 0.25
-            reasons.append("❌ Metadata Check: No camera data found — AI images rarely have EXIF.")
-
-        # AI tool name in EXIF Software tag → near-certain fake
+            reasons.append("❌ Metadata Check: No camera data found — typical of downloaded or AI images.")
+        else:
+            reasons.append(f"✅ Metadata Check: Camera model '{meta['camera']}' detected.")
+            
         software_val = meta.get("software", "Unknown").lower()
         if software_val not in ("unknown", "") and any(kw in software_val for kw in AI_SOFTWARE_NAMES):
-            votes_fake += 3.0
             reasons.append(f"❌ Metadata Check: Software tag reads '{meta['software']}' — a known AI generation tool.")
-
-        # Heavy JPEG compression disclaimer (compressed images mimic GAN noise)
+            
+        # Compress / GAN Noise disclaimer for JPEGs
         try:
             raw_img = Image.open(image_path)
             if raw_img.format == "JPEG" and hasattr(raw_img, "quantization") and raw_img.quantization:
                 luma = raw_img.quantization.get(0, [])
                 if luma and (sum(luma) / len(luma)) > 25:
-                    reasons.append("⚠️  Compression Check: Image is heavily compressed — result may be less reliable.")
+                    reasons.append("⚠️ Compression Check: Image is heavily compressed — result may be less reliable.")
         except Exception as e:
             print(f"JPEG quality check failed: {e}")
-
-        # --- STEP 2: FINAL VERDICT ---
-
-        total_weight = votes_fake + votes_real
-        # ai_probability: fraction of weighted evidence that points to fake, as a percent.
-        # This is directional (fake vs real), not just jury certainty.
-        ai_probability = round((votes_fake / total_weight * 100) if total_weight > 0 else 50.0, 2)
-
-        signals = {
-            "Face Expert":     round(c1, 1) if c1 is not None else 0,
-            "Artistic Expert": round(c2, 1) if c2 is not None else 0,
-            "Legacy Expert":   round(c3, 1) if c3 is not None else 0,
-            "Pixel Expert":    round(c4, 1) if c4 is not None else 0,
-            "General Expert":  round(c5, 1) if c5 is not None else 0,
-        }
-
-        if votes_fake >= 4:
-            # count_fake == 5 means all model slots agreed (not the metadata bonus votes)
-            score = max(ai_probability, 95.0) if count_fake == 5 else ai_probability
-            label = f"AI Generated ({count_fake}/5 Experts Agree)"
-        elif votes_fake >= 3:
+            
+        # 4. Determine final label using standard TrueSight thresholds
+        if ai_score >= 85:
+            label = "AI Generated"
+        elif ai_score >= 60:
             label = "Likely AI Generated"
-            score = ai_probability
-        elif votes_fake >= 2:
+        elif ai_score >= 45:
             label = "Suspicious / Inconclusive"
-            score = ai_probability
+        elif ai_score >= 20:
+            label = "Likely Real"
         else:
-            label = f"Likely Real ({count_real}/5 Experts Agree)"
-            score = ai_probability
-
-        return label, score, reasons, signals
+            label = "Real Photo"
+            
+        return label, round(ai_score, 2), reasons, signals
 
     except Exception as e:
-        print(f"ERROR: {e}")
+        print(f"ERROR inside predict_image: {e}")
         return "Error", 0.0, ["Analysis failed due to server error."], {}
 
-
-def extract_metadata(image_path):
+def extract_metadata(image_path: str) -> dict:
     try:
         image = Image.open(image_path)
         # Use the public getexif() API (Pillow 6+) instead of deprecated _getexif()
