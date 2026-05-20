@@ -11,7 +11,8 @@ In version 1.1, TrueSight has been migrated from a local, memory-heavy 5-model j
 * **Explainability:** Generates a detailed forensic report explaining exactly WHY the AI reached its verdict (pointing out AI signatures, deepfake risks, and metadata details).
 * **Metadata Validation:** Captures camera make, model, and software EXIF tags to supplement the verdict (e.g., automatically flagging images with "Midjourney" or "stable diffusion" signatures).
 * **Generator Attribution:** Detects and attributes which specific engine generated the image (e.g., Midjourney, DALL-E, Stable Diffusion).
-* **Smart Memory:** Keeps local SQLite database history of all analyzed scans for easy cross-referencing.
+* **Local Scan History:** Keeps a local SQLite history of every analyzed image for easy review.
+* **Supported formats:** JPEG, PNG, WEBP — up to 200 MB per image.
 
 ---
 
@@ -51,8 +52,8 @@ TrueSight v1.1 requires a Hive API key to analyze images:
 Use the "One-Click Launcher" to run both the frontend and backend instantly:
 
 1. Double-click the file named `start.bat`.
-2. Two black terminal windows will open (one for the Flask Backend on port 5000, one for the HTTP Frontend on port 8000).
-3. The main terminal window will display the URL to open (e.g., `http://192.168.1.5:8000`).
+2. Two terminal windows will open: the Flask backend on **port 5000** (handles uploads and Hive calls) and a static frontend host on **port 8000** (serves the UI).
+3. The main terminal window will display the URL to open (e.g., `http://192.168.1.5:8000`). Open it on your phone or PC browser.
 
 ---
 

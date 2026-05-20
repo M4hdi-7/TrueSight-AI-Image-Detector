@@ -9,13 +9,14 @@ import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from PIL import Image
-from ai_model.model import predict_image, extract_metadata
+from ai_model.model import predict_image
 from werkzeug.utils import secure_filename
 
 
 # --- SETTINGS ---
-UPLOAD_FOLDER = "uploads"
-DB_FILE = "history.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+DB_FILE = os.path.join(BASE_DIR, "history.db")
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 Megabytes
 
@@ -93,10 +94,9 @@ def predict():
             os.remove(image_path)
             return jsonify({"error": "File is not a valid image."}), 400
 
-        # --- ASK THE AI JURY ---
-        label, confidence, reasons, signals = predict_image(image_path)
-        metadata = extract_metadata(image_path)
-        
+        # --- CALL HIVE + COMPOSE FORENSIC REPORT ---
+        label, confidence, reasons, signals, metadata = predict_image(image_path)
+
         # Save everything to our history file
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         reasons_json = json.dumps(reasons) # We need to turn the list into text for the database
@@ -134,7 +134,7 @@ def get_history():
             # Get the last 50 scans, newest first
             cursor.execute("SELECT * FROM history ORDER BY id DESC LIMIT 50")
             rows = cursor.fetchall()
-            
+
             history_data = []
             for row in rows:
                 history_data.append({
@@ -145,7 +145,7 @@ def get_history():
                     "reasons": json.loads(row["reasons"]), # Turn the text back into a list
                     "timestamp": row["timestamp"]
                 })
-            
+
             return jsonify(history_data)
     except Exception as e:
         print(e)
@@ -161,20 +161,23 @@ def clear_history():
             file_path = os.path.join(UPLOAD_FOLDER, f)
             if os.path.isfile(file_path):
                 os.remove(file_path)
-        
+
         # Wipe the database rows
         with sqlite3.connect(DB_FILE) as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM history")
             conn.commit()
-            
+
         return jsonify({"status": "cleared"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Prevent the browser from saving old versions of the site (Caching)
+# Prevent the browser from caching API responses so the UI always shows fresh data.
+# Uploaded images live under /uploads/<uuid>.<ext> and are immutable — let them cache.
 @app.after_request
 def add_header(response):
+    if request.path.startswith('/uploads/'):
+        return response
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
