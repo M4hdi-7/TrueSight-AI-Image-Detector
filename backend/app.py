@@ -17,7 +17,7 @@ from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = "uploads"
 DB_FILE = "history.db"
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
-MAX_FILE_SIZE = 16 * 1024 * 1024  # 16 Megabytes
+MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 Megabytes
 
 app = Flask(__name__)
 CORS(app) # Allow the frontend (phone) to talk to the backend (PC)
@@ -73,7 +73,8 @@ def predict():
             return jsonify({"error": "Empty filename"}), 400
 
         if not allowed_file(file.filename):
-            return jsonify({"error": "Invalid file type"}), 400
+            allowed_list = ", ".join(sorted(ALLOWED_EXTENSIONS)).upper()
+            return jsonify({"error": f"Unsupported file type. Accepted: {allowed_list}."}), 400
 
         # Give the file a unique name so we don't overwrite old photos
         original_name = secure_filename(file.filename)
