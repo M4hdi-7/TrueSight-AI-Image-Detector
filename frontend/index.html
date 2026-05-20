@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>TrueSight | AI Image Detector</title>
 
     <link rel="icon" type="image/png" href="favicon.png">
@@ -14,7 +17,7 @@
     <meta name="apple-mobile-web-app-title" content="TrueSight">
     <meta name="theme-color" content="#003057">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -37,13 +40,13 @@
             <img src="logo_dark.png" alt="TrueSight Logo" class="app-logo logo-dark">
         </header>
 
-        <nav class="tab-bar">
-            <div class="tab-group">
-                <button class="tab-btn active" onclick="switchTab('home')">
-                    <i class="fas fa-home"></i> <span>Home</span>
+        <nav class="tab-bar" aria-label="Primary">
+            <div class="tab-group" role="tablist">
+                <button class="tab-btn active" role="tab" id="tab-home" aria-selected="true" aria-controls="home-view" onclick="switchTab('home')">
+                    <i class="fas fa-home" aria-hidden="true"></i> <span>Home</span>
                 </button>
-                <button class="tab-btn" onclick="switchTab('history')">
-                    <i class="fas fa-history"></i> <span>History</span>
+                <button class="tab-btn" role="tab" id="tab-history" aria-selected="false" aria-controls="history-view" tabindex="-1" onclick="switchTab('history')">
+                    <i class="fas fa-history" aria-hidden="true"></i> <span>History</span>
                 </button>
             </div>
             <span class="nav-divider" aria-hidden="true"></span>
@@ -62,15 +65,34 @@
             </button>
         </nav>
 
-        <main id="home-view" class="view active-view">
+        <main id="home-view" class="view active-view" role="tabpanel" aria-labelledby="tab-home">
+          <div class="home-grid">
+            <aside class="intro-panel" aria-label="About TrueSight">
+                <img src="logo.png" alt="" class="intro-logo logo-light" aria-hidden="true">
+                <img src="logo_dark.png" alt="" class="intro-logo logo-dark" aria-hidden="true">
+                <span class="intro-eyebrow">TrueSight &middot; v1.0</span>
+                <h1 class="intro-title">AI-Generated Image Detection</h1>
+                <p class="intro-desc">
+                    Upload an image and TrueSight sends it through Hive AI&rsquo;s
+                    detection model to estimate the likelihood that it was created
+                    by a generative AI &mdash; with engine attribution when available.
+                </p>
+                <ul class="intro-features">
+                    <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Powered by Hive AI detection</span></li>
+                    <li><i class="fas fa-robot" aria-hidden="true"></i><span>Engine attribution when detected</span></li>
+                    <li><i class="fas fa-circle-info" aria-hidden="true"></i><span>EXIF metadata shown for reference</span></li>
+                    <li><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span>Local scan history</span></li>
+                </ul>
+            </aside>
+
             <div class="card main-card">
 
-                <div class="upload-area" id="dropZone">
+                <div class="upload-area" id="dropZone" role="button" tabindex="0" aria-label="Upload image. Click or press Enter to browse, or drop an image here.">
                     <div class="icon-circle">
-                        <i class="fas fa-cloud-upload-alt"></i>
+                        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
                     </div>
                     <h3>Upload Image</h3>
-                    <p>JPEG, PNG, WEBP, up to 16MB</p>
+                    <p>JPEG, PNG, WEBP &middot; up to 200&thinsp;MB</p>
                     <input type="file" id="fileInput" accept="image/*" hidden>
                 </div>
 
@@ -87,9 +109,9 @@
                     Analyze Image
                 </button>
 
-                <div id="loadingIndicator" style="display: none; margin-top: 20px; text-align: center; animation: slideUp 0.3s ease;">
-                    <p style="margin-bottom: 12px; font-weight: 500; font-size: 0.95rem; color: var(--text-muted);"><i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i> Analyzing with Hive AI...</p>
-                    <div style="width: 100%; height: 6px; background-color: var(--bg-progress); border-radius: 4px; overflow: hidden;">
+                <div id="loadingIndicator" class="loading-indicator" hidden>
+                    <p class="loading-label"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Analyzing with Hive AI&hellip;</p>
+                    <div class="loading-track">
                         <div class="indeterminate-progress"></div>
                     </div>
                 </div>
@@ -110,14 +132,20 @@
                         <div id="extraInfo"></div>
                     </div>
 
-                    <button id="detailsBtn" class="secondary-btn" onclick="openDetailsModal()">
-                        <i class="fas fa-search-plus"></i> View Forensic Details
-                    </button>
+                    <div class="result-actions">
+                        <button id="detailsBtn" class="secondary-btn" onclick="openDetailsModal()">
+                            <i class="fas fa-search-plus" aria-hidden="true"></i> View Detection Details
+                        </button>
+                        <button id="newScanBtn" class="primary-btn" type="button">
+                            <i class="fas fa-plus" aria-hidden="true"></i> Analyze Another Image
+                        </button>
+                    </div>
                 </div>
             </div>
+          </div>
         </main>
 
-        <main id="history-view" class="view" style="display: none;">
+        <main id="history-view" class="view" role="tabpanel" aria-labelledby="tab-history" hidden style="display: none;">
             <div class="history-header">
                 <h2>Scan History</h2>
                 <div class="history-actions">
@@ -135,12 +163,12 @@
 
     </div>
 
-    <div id="detailsModal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="detailsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="detailsModalTitle" aria-hidden="true">
+        <div class="modal-content" tabindex="-1">
             <div class="modal-header">
-                <h3>Forensic Report</h3>
-                <button class="close-modal" onclick="closeDetailsModal()">
-                    <i class="fas fa-times"></i>
+                <h3 id="detailsModalTitle">Detection Report</h3>
+                <button class="close-modal" onclick="closeDetailsModal()" aria-label="Close detection report">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -170,7 +198,27 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="imageLightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image preview" aria-hidden="true">
+        <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close image preview">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <img id="lightboxImg" src="" alt="">
+    </div>
+
+    <div id="confirmModal" class="modal-overlay confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage" aria-hidden="true">
+        <div class="modal-content" tabindex="-1">
+            <h3 id="confirmTitle">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button type="button" class="confirm-cancel" id="confirmCancelBtn">Cancel</button>
+                <button type="button" class="confirm-accept" id="confirmAcceptBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="script.js?v=6"></script>
 </body>
 
 </html>
