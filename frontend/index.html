@@ -9,15 +9,24 @@
     <meta http-equiv="Expires" content="0">
     <title>TrueSight | AI Image Detector</title>
 
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="shortcut icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="ios_icon.png">
+    <!-- Favicons: .ico for legacy/IE, 96px PNG for modern desktop browsers -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <!-- iOS "Add to Home Screen" icon -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- PWA / installable web app manifest (uses 192/512 icons) -->
+    <link rel="manifest" href="manifest.json">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TrueSight">
     <meta name="theme-color" content="#003057">
+    <meta name="application-name" content="TrueSight">
 
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -218,7 +227,7 @@
 
     <div id="toastContainer" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="script.js?v=6"></script>
+    <script src="script.js?v=7"></script>
 </body>
 
 </html>
