@@ -7,8 +7,9 @@ TIMEOUT_SECONDS = 60
 
 def classify_image(image_path: str) -> dict:
     """
-    POSTs the image to Sightengine's AI-Generated Image Detection API.
-    Uses the 'genai' model. Returns the parsed JSON response.
+    POSTs the image to Sightengine's /check.json with the 'genai' and 'deepfake'
+    models. Each model counts as one operation against your monthly quota.
+    Returns the parsed JSON response.
     """
     api_user = os.environ.get("SIGHTENGINE_API_USER")
     api_secret = os.environ.get("SIGHTENGINE_API_SECRET")
@@ -20,7 +21,7 @@ def classify_image(image_path: str) -> dict:
 
     with open(image_path, "rb") as f:
         data = {
-            "models": "genai",
+            "models": "genai,deepfake",
             "api_user": api_user,
             "api_secret": api_secret,
         }

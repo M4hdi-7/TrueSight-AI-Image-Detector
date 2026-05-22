@@ -14,10 +14,16 @@ def _safe_print(reasons):
 
 
 def main():
-    print("--- TRUESIGHT SIGHTENGINE INTEGRATION VERIFIER ---")
+    print("--- TRUESIGHT SIGHTENGINE (+ HIVE ATTRIBUTION) VERIFIER ---")
+    print("Sightengine is primary; Hive is called only when an image is")
+    print("judged AI, purely to extract generator attribution.")
 
     test_image_missing_key = os.path.join(PROJECT_ROOT, "Test", "images.jpg")
-    test_image_full = os.path.join(PROJECT_ROOT, "Test", "Dwayne_Johnson_2014_(cropped).jpg")
+    # Use a known-AI sample so we exercise the Hive attribution cascade.
+    test_image_full = os.path.join(
+        PROJECT_ROOT, "Test",
+        "Midjourney-for-Beginners-AI-Art-by-Sprinkle-of-AI-4-XL-683x1024.jpg",
+    )
 
     # 1. Test Behavior WITHOUT Sightengine credentials
     print("\n[Test 1] Testing without SIGHTENGINE_API_USER / SIGHTENGINE_API_SECRET in environment...")

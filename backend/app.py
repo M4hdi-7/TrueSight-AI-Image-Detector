@@ -17,8 +17,8 @@ from werkzeug.utils import secure_filename
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 DB_FILE = os.path.join(BASE_DIR, "history.db")
-ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
-MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 Megabytes
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff", "jp2"}
+MAX_FILE_SIZE = 12 * 1024 * 1024  # 12 MB — Sightengine's hard upload limit
 
 app = Flask(__name__)
 CORS(app) # Allow the frontend (phone) to talk to the backend (PC)
@@ -88,7 +88,7 @@ def predict():
         # This catches renamed non-image files that pass the extension whitelist.
         try:
             with Image.open(image_path) as img:
-                if img.format not in {"JPEG", "PNG", "WEBP"}:
+                if img.format not in {"JPEG", "PNG", "WEBP", "BMP", "TIFF", "JPEG2000"}:
                     raise ValueError(f"Unexpected format: {img.format}")
         except Exception:
             os.remove(image_path)

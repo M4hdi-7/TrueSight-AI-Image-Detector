@@ -259,8 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
 
-            if (file.size > 200 * 1024 * 1024) {
-                showToast("File too large. Max 200MB.", "error");
+            if (file.size > 12 * 1024 * 1024) {
+                showToast("File too large. Max 12MB.", "error");
                 fileInput.value = "";
                 return;
             }
