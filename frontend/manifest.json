@@ -1,7 +1,7 @@
 {
   "name": "TrueSight — AI Image Detector",
   "short_name": "TrueSight",
-  "description": "Detect AI-generated images with Hive AI.",
+  "description": "Detect AI-generated images with Sightengine.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

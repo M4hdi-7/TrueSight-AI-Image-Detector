@@ -1,6 +1,6 @@
 from PIL import Image
 from PIL.ExifTags import TAGS
-from .hive_client import classify_image
+from .sightengine_client import classify_image
 
 MAX_IMAGE_DIMENSION = 8000  # pixels — beyond this PIL risks running out of memory
 
@@ -10,15 +10,6 @@ AI_SOFTWARE_NAMES = [
     "firefly", "imagen", "comfyui", "automatic1111", "novelai", "invokeai",
     "generative", "ai-generated",
 ]
-
-# Hive classes that describe the verdict itself, not the generator engine.
-# Anything outside this set is treated as a candidate engine attribution.
-_HIVE_BASE_CLASSES = {
-    "ai_generated", "not_ai_generated",
-    "deepfake", "not_deepfake", "none",
-    "inconclusive", "inconclusive_video",
-    "ai_generated_audio", "not_ai_generated_audio",
-}
 
 
 def _read_image_signals(image_path: str) -> tuple[int, int, dict, float | None]:
@@ -49,14 +40,14 @@ def _read_image_signals(image_path: str) -> tuple[int, int, dict, float | None]:
 
 def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
     """
-    Analyzes an image using Hive's AI-Generated and Deepfake Content Detection V3 API
+    Analyzes an image using Sightengine's AI-Generated Image Detection API
     integrated with local EXIF metadata inspection.
 
     Returns:
         label:      str   — headline verdict ("AI Generated", "Likely Real", etc.)
         score:      float — 0.0–100.0 representing AI likelihood %
         reasons:    list  — human-readable bullet points for the forensic report
-        signals:    dict  — per-signal breakdown for the UI (mutually exclusive scores mapped as percentages)
+        signals:    dict  — per-signal breakdown for the UI (scores mapped as percentages)
         metadata:   dict  — EXIF summary {"has_exif": bool, "camera": str, "software": str}
     """
     try:
@@ -67,7 +58,6 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
             "has_exif": False, "camera": "Unknown", "software": "Unknown"
         }
 
-    # Reject absurdly large images before API upload to avoid transmission and process overhead
     if width > MAX_IMAGE_DIMENSION or height > MAX_IMAGE_DIMENSION:
         return (
             "Error",
@@ -78,19 +68,25 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
         )
 
     try:
-        hive_response = classify_image(image_path)
+        se_response = classify_image(image_path)
     except Exception as e:
-        print(f"Hive API integration error: {e}")
+        print(f"Sightengine API integration error: {e}")
         return (
             "Error",
             0.0,
-            ["Detection service unavailable. Please check your network connection or API key."],
+            ["Detection service unavailable. Please check your network connection or API credentials."],
             {},
             metadata,
         )
 
-    output = hive_response.get("output", [])
-    if not output:
+    if se_response.get("status") != "success":
+        err = se_response.get("error", {})
+        msg = err.get("message", "Unknown error from detection service.")
+        return "Error", 0.0, [f"Detection service error: {msg}"], {}, metadata
+
+    type_block = se_response.get("type", {})
+    ai_generated_raw = type_block.get("ai_generated")
+    if ai_generated_raw is None:
         return (
             "Error",
             0.0,
@@ -99,42 +95,40 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
             metadata,
         )
 
-    classes = output[0].get("classes", [])
-    scores = {item["class"]: item["value"] * 100 for item in classes if "class" in item and "value" in item}
+    ai_score = float(ai_generated_raw) * 100.0
+    generators = type_block.get("ai_generators", {}) or {}
 
-    ai_score = scores.get("ai_generated", 0.0)
-    deepfake_score = scores.get("deepfake", 0.0)
+    # Build UI signals
+    signals = {"Sightengine AI Classifier": round(ai_score, 1)}
 
-    # Build UI signals (flat dictionary of {signal_name: score_percentage})
-    signals = {}
-    if "ai_generated" in scores:
-        signals["Hive AI Classifier"] = round(scores["ai_generated"], 1)
-    if "deepfake" in scores:
-        signals["Visual Deepfake Head"] = round(scores["deepfake"], 1)
-
-    # Dynamically surface any generator-attribution heads Hive returns (value > 1.0%).
-    # This catches new engines (e.g. gptimage2) without hardcoding them.
-    for item in classes:
-        cls_name = item.get("class", "")
-        val = item.get("value", 0.0) * 100
-        if cls_name not in _HIVE_BASE_CLASSES and val > 1.0:
-            signals[f"Attribution ({cls_name})"] = round(val, 1)
+    # Surface per-generator attributions above a noise floor
+    for gen_name, gen_val in generators.items():
+        try:
+            val_pct = float(gen_val) * 100.0
+        except (TypeError, ValueError):
+            continue
+        if val_pct > 1.0:
+            signals[f"Attribution ({gen_name})"] = round(val_pct, 1)
 
     reasons = []
 
-    # 1. Hive AI generated verdicts
+    # 1. Sightengine AI generated verdict
     if ai_score >= 90:
-        reasons.append("❌ Hive Detector: Strong AI generation signature detected.")
+        reasons.append("❌ Sightengine Detector: Strong AI generation signature detected.")
     elif ai_score >= 60:
-        reasons.append("⚠️ Hive Detector: Some AI-generation features present.")
+        reasons.append("⚠️ Sightengine Detector: Some AI-generation features present.")
     else:
-        reasons.append("✅ Hive Detector: No strong AI-generation signature.")
+        reasons.append("✅ Sightengine Detector: No strong AI-generation signature.")
 
-    # 2. Deepfake detection indicators
-    if deepfake_score >= 90:
-        reasons.append("❌ Deepfake Check: High probability of visual deepfake (face swap).")
-    elif deepfake_score >= 60:
-        reasons.append("⚠️ Deepfake Check: Suspicious face-swap patterns detected.")
+    # 2. Top generator attribution if confident
+    if generators:
+        top_gen, top_val = max(
+            ((k, float(v)) for k, v in generators.items() if isinstance(v, (int, float))),
+            key=lambda kv: kv[1],
+            default=(None, 0.0),
+        )
+        if top_gen and top_val * 100.0 >= 50:
+            reasons.append(f"⚠️ Attribution: Output resembles '{top_gen}' generator.")
 
     # 3. EXIF camera and software metadata
     if not metadata["has_exif"]:
