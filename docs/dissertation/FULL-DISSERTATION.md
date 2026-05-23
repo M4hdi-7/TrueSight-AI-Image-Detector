@@ -332,22 +332,36 @@ Two design choices warrant mention. First, **each external provider has its own 
 
 ### 6.2.1 Entity–Relationship Diagram
 
-```mermaid
-erDiagram
-    HISTORY {
-        INTEGER  id              PK "AUTOINCREMENT"
-        TEXT     filename            "UUID.ext, matches a file in uploads/"
-        TEXT     result              "Verdict label e.g. AI Generated"
-        REAL     confidence          "0.0 to 100.0"
-        TEXT     reasons             "JSON-serialised list of strings"
-        TEXT     timestamp           "YYYY-MM-DD HH:MM"
-    }
-    UPLOADS_FILE {
-        STRING   filename        PK  "UUID.ext on disk"
-        BINARY   content             "Image bytes"
-    }
+The diagram below follows Chen notation: rectangles are entities, ovals are attributes, and the diamond is the relationship between the two entities with its cardinality labelled on the connecting lines.
 
-    HISTORY ||--|| UPLOADS_FILE : "filename references"
+```mermaid
+flowchart TB
+    HISTORY[SCAN_HISTORY]
+    UPLOAD[UPLOAD_FILE]
+    REF{References}
+
+    id((id PK))
+    fn((filename))
+    res((result))
+    conf((confidence))
+    rs((reasons))
+    ts((timestamp))
+
+    ufn((filename PK))
+    bytes((bytes))
+
+    HISTORY --- id
+    HISTORY --- fn
+    HISTORY --- res
+    HISTORY --- conf
+    HISTORY --- rs
+    HISTORY --- ts
+
+    HISTORY ---|1| REF
+    REF ---|1| UPLOAD
+
+    UPLOAD --- ufn
+    UPLOAD --- bytes
 ```
 
 The `HISTORY` table and the `UPLOADS_FILE` directory entries are connected by an implicit one-to-one relationship through `filename`. The relationship is enforced by application logic rather than a database foreign-key constraint, because `UPLOADS_FILE` is a directory listing rather than a SQL entity. The two are kept in sync by two mechanisms: on every successful scan the same UUID is both saved as a file and inserted into the row, and on `DELETE /clear_history` every file under `uploads/` is deleted together with every row in `HISTORY`.
