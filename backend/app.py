@@ -5,12 +5,19 @@ load_dotenv()  # Load environment variables from .env file
 import uuid
 import sqlite3
 import json
+import logging
 import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from PIL import Image
 from ai_model.model import predict_image
 from werkzeug.utils import secure_filename
+
+logging.basicConfig(
+    level=os.environ.get("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logger = logging.getLogger("truesight")
 
 
 # --- SETTINGS ---
@@ -94,7 +101,7 @@ def predict():
             os.remove(image_path)
             return jsonify({"error": "File is not a valid image."}), 400
 
-        # --- CALL HIVE + COMPOSE FORENSIC REPORT ---
+        # --- CALL DETECTION PIPELINE + COMPOSE FORENSIC REPORT ---
         label, confidence, reasons, signals, metadata = predict_image(image_path)
 
         # Save everything to our history file
@@ -120,7 +127,7 @@ def predict():
         })
 
     except Exception as e:
-        print("SERVER ERROR:", e)
+        logger.exception("Unhandled error in /predict: %s", e)
         return jsonify({"error": "Internal server error"}), 500
 
 # 3. Get History
@@ -148,7 +155,7 @@ def get_history():
 
             return jsonify(history_data)
     except Exception as e:
-        print(e)
+        logger.error("Failed to read /history: %s", e)
         return jsonify([])
 
 # 4. Wipe Everything

@@ -1,18 +1,45 @@
+import logging
+
 from PIL import Image
 from PIL.ExifTags import TAGS
+
 from .sightengine_client import classify_image as sightengine_classify
 from .hive_client import classify_image as hive_classify
 
-# Sightengine limits: image must be <= 64 megapixels (width * height) and
-# both width and height must be >= 8 pixels. We mirror those here so the
-# request fails fast locally instead of round-tripping to the API for a 400.
-MAX_IMAGE_MEGAPIXELS = 64
-MIN_IMAGE_DIMENSION = 8
+logger = logging.getLogger(__name__)
 
-# When Sightengine's ai_generated score crosses this threshold, we judge the
-# image as AI and trigger the (expensive) Hive call to fetch generator
-# attribution. Below this, we skip Hive entirely to save quota.
+# ---------------------------------------------------------------------------
+# Input limits (mirror Sightengine's published constraints so we fail fast
+# locally instead of round-tripping to the API for a 400).
+# ---------------------------------------------------------------------------
+MAX_IMAGE_MEGAPIXELS = 64    # width * height
+MIN_IMAGE_DIMENSION = 8      # px; Sightengine rejects anything smaller
+
+# ---------------------------------------------------------------------------
+# Detection thresholds. Adjust here rather than at the call sites so verdict
+# logic stays auditable in one place.
+# ---------------------------------------------------------------------------
+
+# Above this Sightengine score we judge the image as AI and trigger the (more
+# expensive) Hive lookup for generator attribution. Below this we skip Hive
+# entirely so real photos don't burn Hive quota.
 AI_THRESHOLD = 50.0
+
+# Verdict labels — keyed by the minimum ai_score (descending) that triggers each.
+LABEL_THRESHOLDS: list[tuple[float, str]] = [
+    (85.0, "AI Generated"),
+    (60.0, "Likely AI Generated"),
+    (45.0, "Suspicious / Inconclusive"),
+    (20.0, "Likely Real"),
+]
+DEFAULT_LABEL = "Real Photo"
+
+# Reason-text cutoffs (percent).
+SE_STRONG = 90.0
+SE_PARTIAL = 60.0
+DEEPFAKE_HIGH = 90.0
+DEEPFAKE_SUSPICIOUS = 50.0   # Sightengine docs treat > 0.5 as deepfake
+JPEG_HEAVY_COMPRESSION = 25  # average luma quantization
 
 # Known AI generation tool names that may appear in an image's EXIF Software tag
 AI_SOFTWARE_NAMES = [
@@ -67,7 +94,7 @@ def _hive_attributions(image_path: str) -> dict[str, float]:
     try:
         response = hive_classify(image_path)
     except Exception as e:
-        print(f"Hive attribution lookup failed: {e}")
+        logger.warning("Hive attribution lookup failed: %s", e)
         return {}
 
     output = response.get("output", [])
@@ -100,7 +127,7 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
     try:
         width, height, metadata, quant_avg = _read_image_signals(image_path)
     except Exception as e:
-        print(f"ERROR reading image: {e}")
+        logger.error("Could not read image %s: %s", image_path, e)
         return "Error", 0.0, ["Could not read image file."], {}, {
             "has_exif": False, "camera": "Unknown", "software": "Unknown"
         }
@@ -133,7 +160,7 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
     try:
         se_response = sightengine_classify(image_path)
     except Exception as e:
-        print(f"Sightengine API integration error: {e}")
+        logger.error("Sightengine API integration error: %s", e)
         return (
             "Error",
             0.0,
@@ -185,9 +212,9 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
     reasons: list[str] = []
 
     # 1. Sightengine AI generated verdict
-    if ai_score >= 90:
+    if ai_score >= SE_STRONG:
         reasons.append("❌ Sightengine Detector: Strong AI generation signature detected.")
-    elif ai_score >= 60:
+    elif ai_score >= SE_PARTIAL:
         reasons.append("⚠️ Sightengine Detector: Some AI-generation features present.")
     else:
         reasons.append("✅ Sightengine Detector: No strong AI-generation signature.")
@@ -199,11 +226,11 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
         else:
             reasons.append("🤖 Generator: AI-generated, but Hive could not identify a specific engine.")
 
-    # 3. Deepfake detection indicators (Sightengine docs treat >0.5 as deepfake)
+    # 3. Deepfake detection indicators
     if deepfake_score is not None:
-        if deepfake_score >= 90:
+        if deepfake_score >= DEEPFAKE_HIGH:
             reasons.append("❌ Deepfake Check: High probability of visual deepfake (face swap).")
-        elif deepfake_score >= 50:
+        elif deepfake_score >= DEEPFAKE_SUSPICIOUS:
             reasons.append("⚠️ Deepfake Check: Suspicious face-swap patterns detected.")
 
     # 4. EXIF camera and software metadata
@@ -217,19 +244,14 @@ def predict_image(image_path: str) -> tuple[str, float, list[str], dict, dict]:
         reasons.append(f"❌ Metadata Check: Software tag reads '{metadata['software']}' — a known AI generation tool.")
 
     # 5. JPEG compression heaviness disclaimer
-    if quant_avg is not None and quant_avg > 25:
+    if quant_avg is not None and quant_avg > JPEG_HEAVY_COMPRESSION:
         reasons.append("⚠️ Compression Check: Image is heavily compressed — result may be less reliable.")
 
-    # 6. Final label using TrueSight thresholds (driven by Sightengine's score)
-    if ai_score >= 85:
-        label = "AI Generated"
-    elif ai_score >= 60:
-        label = "Likely AI Generated"
-    elif ai_score >= 45:
-        label = "Suspicious / Inconclusive"
-    elif ai_score >= 20:
-        label = "Likely Real"
-    else:
-        label = "Real Photo"
+    # 6. Final label, driven by Sightengine's score against LABEL_THRESHOLDS.
+    label = DEFAULT_LABEL
+    for cutoff, name in LABEL_THRESHOLDS:
+        if ai_score >= cutoff:
+            label = name
+            break
 
     return label, round(ai_score, 2), reasons, signals, metadata
