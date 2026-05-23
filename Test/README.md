@@ -32,6 +32,10 @@ Fill in the **Verified** column once you've confirmed each image's true origin. 
 
 ## How to use
 
+**For automated evaluation:** Run `backend/evaluate.py`. It parses this file's "Expected" column to get ground-truth labels (only rows starting with `Real` or `AI` are used — `Unknown` rows are skipped) and produces a confusion matrix plus a Markdown report at `evaluation_report.md`.
+
+**For manual inspection:**
+
 1. Start the app (`.\start.bat`) and upload each image through the UI.
 2. Record TrueSight's verdict (label + score) and compare against the verified ground truth.
 3. Edge cases worth documenting in the report:

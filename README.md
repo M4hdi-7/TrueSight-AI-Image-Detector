@@ -109,6 +109,14 @@ cd backend ; venv\Scripts\python.exe verify_sightengine.py
 
 Confirms credentials are valid and the pipeline returns a verdict on a known AI sample.
 
+### 4. Evaluate the detector against `Test/`
+
+```powershell
+cd backend ; venv\Scripts\python.exe evaluate.py
+```
+
+Reads the ground-truth labels from `Test/README.md`, runs every labelled image through `predict_image`, prints a confusion matrix + precision / recall / F1, and saves a dissertation-ready Markdown report at `evaluation_report.md` plus per-image JSON at `evaluation_results.json`.
+
 ---
 
 ## Running it
