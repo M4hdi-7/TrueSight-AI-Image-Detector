@@ -15,6 +15,9 @@ backend/history.db
 backend/uploads/*
 !backend/uploads/.gitkeep
 
+# Runtime artefacts from evaluate.py
+evaluation_run.log
+
 # OS Files
 .DS_Store
 Thumbs.db

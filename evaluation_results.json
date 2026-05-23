@@ -1,0 +1,964 @@
+{
+  "summary": {
+    "total_candidates": 59,
+    "valid": 59,
+    "errors": 0,
+    "ai_threshold": 50.0,
+    "confusion_matrix": {
+      "tp": 39,
+      "fp": 0,
+      "fn": 1,
+      "tn": 19
+    },
+    "metrics": {
+      "accuracy": 0.9830508474576272,
+      "precision": 1.0,
+      "recall": 0.975,
+      "f1": 0.9873417721518987
+    },
+    "generated_at": "2026-05-23T12:32:39"
+  },
+  "results": [
+    {
+      "filename": "Dwayne_Johnson_2014_(cropped).jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 1.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "✅ Metadata Check: Camera model 'Unknown' detected."
+      ]
+    },
+    {
+      "filename": "Elon_Musk_(54816836217)_(cropped_2)_(b).jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 2.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "✅ Metadata Check: Camera model 'Canon EOS R5' detected."
+      ]
+    },
+    {
+      "filename": "87500673_7cec21f38a_b.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "alvan-nee-zhnfJmfeNG0-unsplash.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "cedric-letsch-Racqz_gECu4-unsplash.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "ilke-yazgan-a8b6zP1wEDQ-unsplash.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "kevin-mueller-5z4GbvfNbSw-unsplash.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Suspicious / Inconclusive",
+      "ai_score": 48.0,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "hubble-ngc1266-2-4f-flat-final-crop2.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "merlin_215187303_80e12403-9968-4f28-a197-7323c73613a5-articleLarge.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "VIER PFOTEN_2025-02-18_00108-2736x1824-2286x1582-1920x1329.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "istockphoto-1289220723-612x612.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 1.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "✅ Metadata Check: Camera model 'Unknown' detected.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "ChatGPT Image May 20, 2026, 12_22_08 AM.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 73.0,
+      "top_engine": "gptimage2",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gptimage2' (14% confidence).",
+        "⚠️ Deepfake Check: Suspicious face-swap patterns detected.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_ (1).png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 2.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_ (2).png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 26.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_ (3).png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 2.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_ (4).png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_ (5).png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_ (7).png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (45% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_e0gm19e0gm19e0gm.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 6.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_vx7ookvx7ookvx7o.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (99% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Gemini_Generated_Image_wbdy6wwbdy6wwbdy.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "gemini3",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gemini3' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "Midjourney-for-Beginners-AI-Art-by-Sprinkle-of-AI-4-XL-683x1024.jpg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "flux",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'flux' (51% confidence).",
+        "✅ Metadata Check: Camera model 'Unknown' detected."
+      ]
+    },
+    {
+      "filename": "mjv7-vs-mjv8-1-v0-872pf5hhks2h1.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (53% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "mjv7-vs-mjv8-1-v0-ujxjftfdks2h1.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "kling",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'kling' (96% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "dalle3-examples-with-fairly-long-and-specific-prompts-v0-dfh0d75h94rb1.jpg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "dalle",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'dalle' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "ai-generated-8794203_1280.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "stablediffusionxl",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'stablediffusionxl' (70% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "paris-garbage-viral-ai-images.jpg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (99% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "its-still-nuts-to-me-how-realistic-ai-is-getting-incredible-v0-bcxd5awmq50h1.webp",
+      "true_label": "ai",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 2.0,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": false,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "its-still-nuts-to-me-how-realistic-ai-is-getting-incredible-v0-jaac6rreq50h1.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "zimage",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'zimage' (78% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "large-built-muscular-young-ohio-dude-enjoys-a-quiet-v0-g24cqopw5e2h1.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "gptimage1_5",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gptimage1_5' (91% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "large-built-muscular-young-ohio-dude-enjoys-a-quiet-v0-ggn2xukt5e2h1.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "gptimage2",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gptimage2' (66% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "08-1040097-686c64f5eea40.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (40% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "179ba040-7560-11ef-90f9-fd554410d16e.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "flux",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'flux' (77% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "18-1077418-69438ec474f13.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 18.0,
+      "top_engine": "ideogram",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'ideogram' (36% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "18-1077430-694392f34ef7d.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 68.0,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (100% confidence).",
+        "⚠️ Deepfake Check: Suspicious face-swap patterns detected.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "1_zEXe2G5Rc2b6Wowb6_Av9A.jpg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "4o",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely '4o' (58% confidence).",
+        "✅ Metadata Check: Camera model 'Unknown' detected.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "1jbj5sp3np9f1.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "gptimage2",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gptimage2' (82% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "28-1075179-69296af0aab06.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 10.0,
+      "top_engine": "krea",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'krea' (36% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "360_F_260350247_eGO8MWYwjIpml40GRWmIZ7tOs2G3iQtD.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 1.0,
+      "deepfake_score": 1.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "✅ Metadata Check: Camera model 'Unknown' detected."
+      ]
+    },
+    {
+      "filename": "361af094c8d26cc553cffa1e8ad66506.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "✅ Metadata Check: Camera model 'Unknown' detected."
+      ]
+    },
+    {
+      "filename": "6qomj007hrqg1.jpeg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "gptimage1_5",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'gptimage1_5' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "agp58awbip1g1.jpeg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "4o",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely '4o' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "ikscie9x2dkf1.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "stablediffusion",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'stablediffusion' (64% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "l8yp0vlah2pf1.jpeg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 3.0,
+      "top_engine": "4o",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely '4o' (100% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "images.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "IMG_6280.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 0.1,
+      "top_engine": "grok",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'grok' (2% confidence).",
+        "✅ Metadata Check: Camera model 'Unknown' detected."
+      ]
+    },
+    {
+      "filename": "F041_rt_feature.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 1.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "✅ Metadata Check: Camera model 'Unknown' detected.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "SEI_217242335.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (87% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "WhatsApp Image 2026-05-20 at 9.36.39 PM (2).jpeg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 96.0,
+      "top_engine": "sdxlinpaint",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'sdxlinpaint' (41% confidence).",
+        "❌ Deepfake Check: High probability of visual deepfake (face swap).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "magic-of-play.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 1.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "boy-jumping-in-puddle-scaled.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 1.0,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images.",
+        "⚠️ Compression Check: Image is heavily compressed — result may be less reliable."
+      ]
+    },
+    {
+      "filename": "photo-1529778873920-4da4926a72c2.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "summer-landscape-with-river.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "sy95ysyxu0af1.png",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 96.0,
+      "top_engine": "4o",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely '4o' (84% confidence).",
+        "❌ Deepfake Check: High probability of visual deepfake (face swap).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "this-is-what-ai-can-do-v0-pdrpiafl88vc1.jpg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 96.0,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (99% confidence).",
+        "❌ Deepfake Check: High probability of visual deepfake (face swap).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "tobias-reich-lAOr626zEbM-unsplash.jpg",
+      "true_label": "real",
+      "predicted_label": "real",
+      "verbose_verdict": "Real Photo",
+      "ai_score": 0.1,
+      "deepfake_score": 0.1,
+      "top_engine": null,
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "✅ Sightengine Detector: No strong AI-generation signature.",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "trump-arrested-viral-ai-images.jpeg",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 47.0,
+      "top_engine": "midjourney",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'midjourney' (95% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    },
+    {
+      "filename": "z-image-turbo-finetune-of-absurd-reality-v0-xi75jnfriuwg1.webp",
+      "true_label": "ai",
+      "predicted_label": "ai",
+      "verbose_verdict": "AI Generated",
+      "ai_score": 99.0,
+      "deepfake_score": 1.0,
+      "top_engine": "zimage",
+      "correct": true,
+      "error": null,
+      "reasons": [
+        "❌ Sightengine Detector: Strong AI generation signature detected.",
+        "🤖 Generator (via Hive): Most likely 'zimage' (53% confidence).",
+        "❌ Metadata Check: No camera data found — typical of downloaded or AI images."
+      ]
+    }
+  ]
+}

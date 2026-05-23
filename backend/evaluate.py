@@ -274,6 +274,41 @@ def write_markdown_report(
                 f.write(f"- `{r.filename}`: {r.error}\n")
 
 
+def load_cached_results(json_path: str) -> dict[str, Result]:
+    """
+    Load successfully-completed results from a previous run so they can be
+    reused. Errored results are NOT cached — they'll be retried on this run.
+
+    Returns {} if the file doesn't exist or can't be parsed.
+    """
+    if not os.path.exists(json_path):
+        return {}
+    try:
+        with open(json_path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"  (could not load previous results from {json_path}: {e})")
+        return {}
+
+    cached: dict[str, Result] = {}
+    for r in data.get("results", []):
+        if r.get("error"):
+            continue
+        cached[r["filename"]] = Result(
+            filename=r["filename"],
+            true_label=r["true_label"],
+            predicted_label=r["predicted_label"],
+            verbose_verdict=r["verbose_verdict"],
+            ai_score=r["ai_score"],
+            deepfake_score=r.get("deepfake_score"),
+            top_engine=r.get("top_engine"),
+            correct=r["correct"],
+            error=r.get("error"),
+            reasons=r.get("reasons", []),
+        )
+    return cached
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
@@ -293,18 +328,30 @@ def main() -> None:
     n_ai = sum(1 for v in truth.values() if v == "ai")
     n_real = sum(1 for v in truth.values() if v == "real")
 
+    # Resume: skip images that already succeeded in a previous run. Their
+    # ground-truth label must still match — otherwise we re-run to pick up
+    # the label change.
+    cached = load_cached_results(RESULTS_JSON)
+    reusable = {
+        f: cached[f] for f in truth
+        if f in cached and cached[f].true_label == truth[f]
+    }
+    to_call = [(f, truth[f]) for f in sorted(truth) if f not in reusable]
+
     print("--- TRUESIGHT EVALUATION HARNESS ---")
     print(f"Ground truth source: {GROUND_TRUTH_FILE}")
     print(f"Test directory:      {TEST_DIR}")
     print(f"Labelled images:     {len(truth)}  ({n_ai} AI, {n_real} real)")
-    print(f"Estimated cost:      ~{len(truth) * 10} Sightengine ops + ~{n_ai} Hive calls")
+    print(f"Reusing cached:      {len(reusable)} (from previous successful runs)")
+    print(f"To be called:        {len(to_call)}")
+    print(f"Estimated cost:      ~{len(to_call) * 10} Sightengine ops + ~{sum(1 for _, l in to_call if l == 'ai')} Hive calls")
     print("")
     print("Running predictions...")
     print("")
 
-    results: list[Result] = []
-    for i, (fname, label) in enumerate(sorted(truth.items()), 1):
-        print(f"  [{i:>2}/{len(truth)}] {_truncate(fname, 55):<55} ", end="", flush=True)
+    results: list[Result] = list(reusable.values())
+    for i, (fname, label) in enumerate(to_call, 1):
+        print(f"  [{i:>2}/{len(to_call)}] {_truncate(fname, 55):<55} ", end="", flush=True)
         r = evaluate_one(fname, label)
         if r.error:
             print(f"ERROR: {_truncate(r.error, 60)}")
