@@ -87,6 +87,16 @@ The frontend enforces the 12 MB upload cap client-side, surfacing the violation 
 
 The dark theme is implemented through CSS custom properties on the `:root` and `[data-theme="dark"]` selectors. The chosen theme persists across sessions in `localStorage` and is applied before first paint to prevent a flash of the wrong theme on dark-mode reload.
 
+### 7.4.8 Mobile / phone view
+
+`[INSERT SCREENSHOT: 08-mobile-home.png]`
+
+`[INSERT SCREENSHOT: 09-mobile-verdict.png]`
+
+`[INSERT SCREENSHOT: 10-mobile-history.png]`
+
+The same interface viewed from a phone on the same Wi-Fi network as the host machine. The layout is responsive: the upload zone fills the viewport width, the verdict card and details modal stack vertically, and the history entries render as single-column cards. No mobile-specific code path exists — the same HTML, CSS, and JavaScript serve both form factors, with breakpoints driven by CSS media queries. This is the LAN-accessibility scenario described in chapter 5: a user captures or receives an image on their phone and analyses it directly through the browser without transferring the file to the host machine.
+
 ## 7.5 Scenarios
 
 **Journalist verifying a viral image.** A reporter receives a forwarded image of a public figure in an unusual situation. Before publication, the reporter opens TrueSight on the newsroom's local network from a phone, drops the image into the upload zone, and waits roughly ten seconds. The verdict returns "AI Generated" at 99 percent confidence with Midjourney named as the most likely generator. The reasons list highlights the absence of EXIF metadata. The reporter captures the verdict screen for the editorial trail and declines to publish. The image never leaves the LAN.

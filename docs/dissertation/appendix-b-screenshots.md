@@ -43,3 +43,13 @@ The frontend enforces the 12 MB upload cap client-side and surfaces the violatio
 `[INSERT SCREENSHOT: 07-dark-theme.png]`
 
 The dark theme is implemented through CSS custom properties on the `:root` and `[data-theme="dark"]` selectors. The chosen theme persists across sessions in `localStorage` and is applied before first paint, preventing a flash of the wrong theme on dark-mode reload.
+
+## B.8 Mobile / phone view
+
+`[INSERT SCREENSHOT: 08-mobile-home.png]`
+
+`[INSERT SCREENSHOT: 09-mobile-verdict.png]`
+
+`[INSERT SCREENSHOT: 10-mobile-history.png]`
+
+The same TrueSight web interface viewed from a phone connected to the same Wi-Fi network as the host machine. The layout is responsive — the upload zone fills the viewport width, navigation collapses for narrower screens, the verdict card and signal modal stack vertically, and the history entries render as single-column cards. No mobile-specific code path exists; the same HTML, CSS, and JavaScript serve both desktop and mobile, with breakpoints driven by CSS media queries. This is the LAN-accessibility scenario described in the use cases — a user captures or receives an image on their phone and analyses it through the browser without needing to transfer the file to the host machine first.
