@@ -18,7 +18,10 @@ backend/uploads/*
 # Runtime artefacts from evaluate.py
 evaluation_run.log
 
+# Test images (local-only sample set, not for GitHub)
+Test/
+
 # OS Files
 .DS_Store
 Thumbs.db
-Test
+

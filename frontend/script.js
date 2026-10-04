@@ -381,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (extra) extra.innerHTML = signalsHTML;
             }
 
-            // SAVE CURRENT ANALYSIS
+            // SAVE CURRENT ANALYSISaggg
             currentAnalysis = {
                 image: `${BASE_URL}/uploads/${data.filename}`,
                 result: data.verdict,
