@@ -390,7 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 metadata: data.metadata,
                 reasons: data.reasons
             };
-//mahdi test
+
             fetchHistory();
 
         } catch (error) {
